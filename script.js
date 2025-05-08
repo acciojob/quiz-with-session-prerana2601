@@ -1,23 +1,22 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   loadProgress();
 
-  // Save answer when changed
   const radios = document.querySelectorAll("input[type='radio']");
   radios.forEach(radio => {
     radio.addEventListener("change", saveProgress);
   });
 
-  // On submit
-  document.getElementById("submit").addEventListener("click", function () {
+  document.getElementById("submit").addEventListener("click", () => {
     const correctAnswers = {
-      q1: "B",
-      q2: "C",
-      q3: "B",
-      q4: "A",
-      q5: "B"
+      q1: "B", // Paris
+      q2: "C", // 8
+      q3: "B", // Einstein
+      q4: "A", // H2O
+      q5: "B"  // Jupiter
     };
 
     let score = 0;
+
     for (let key in correctAnswers) {
       const selected = document.querySelector(`input[name="${key}"]:checked`);
       if (selected && selected.value === correctAnswers[key]) {
@@ -25,14 +24,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    document.getElementById("score").textContent = `Your score is ${score} out of 5.`;
+    const scoreText = `Your score is ${score} out of 5.`;
+    document.getElementById("score").textContent = scoreText;
     localStorage.setItem("score", score);
   });
 
-  // Show last score if exists
-  const lastScore = localStorage.getItem("score");
-  if (lastScore !== null) {
-    document.getElementById("score").textContent = `Your previous score is ${lastScore} out of 5.`;
+  // Show previous score if available
+  const savedScore = localStorage.getItem("score");
+  if (savedScore !== null) {
+    document.getElementById("score").textContent = `Your previous score is ${savedScore} out of 5.`;
   }
 });
 
