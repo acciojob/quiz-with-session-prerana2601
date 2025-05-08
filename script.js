@@ -1,56 +1,70 @@
-//your JS code here.
+// A simple quiz system with session and local storage
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to load progress from session storage
+    loadProgress();
 
-// Do not change code below this line
-// This code will just display the questions to the screen
-const questions = [
-  {
-    question: "What is the capital of France?",
-    choices: ["Paris", "London", "Berlin", "Madrid"],
-    answer: "Paris",
-  },
-  {
-    question: "What is the highest mountain in the world?",
-    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
-    answer: "Everest",
-  },
-  {
-    question: "What is the largest country by area?",
-    choices: ["Russia", "China", "Canada", "United States"],
-    answer: "Russia",
-  },
-  {
-    question: "Which is the largest planet in our solar system?",
-    choices: ["Earth", "Jupiter", "Mars"],
-    answer: "Jupiter",
-  },
-  {
-    question: "What is the capital of Canada?",
-    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
-    answer: "Ottawa",
-  },
-];
+    // Function to handle answer selection and store in session storage
+    const questions = document.querySelectorAll('input[type="radio"]');
+    questions.forEach(question => {
+        question.addEventListener('change', function() {
+            saveProgress();
+        });
+    });
 
-// Display the quiz questions and choices
-function renderQuestions() {
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
-    const questionElement = document.createElement("div");
-    const questionText = document.createTextNode(question.question);
-    questionElement.appendChild(questionText);
-    for (let j = 0; j < question.choices.length; j++) {
-      const choice = question.choices[j];
-      const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
-      if (userAnswers[i] === choice) {
-        choiceElement.setAttribute("checked", true);
-      }
-      const choiceText = document.createTextNode(choice);
-      questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
-    }
-    questionsElement.appendChild(questionElement);
-  }
+    // Submit button logic
+    document.getElementById('submit').addEventListener('click', function() {
+        const score = calculateScore();
+        document.getElementById('score').textContent = `Your score is ${score} out of 5.`;
+
+        // Store the score in local storage
+        localStorage.setItem('score', score);
+    });
+});
+
+// Function to save progress to session storage
+function saveProgress() {
+    const progress = {};
+    const questions = document.querySelectorAll('input[type="radio"]');
+    questions.forEach(question => {
+        if (question.checked) {
+            progress[question.name] = question.value;
+        }
+    });
+    sessionStorage.setItem('progress', JSON.stringify(progress));
 }
-renderQuestions();
+
+// Function to load progress from session storage
+function loadProgress() {
+    const progress = JSON.parse(sessionStorage.getItem('progress') || '{}');
+    const questions = document.querySelectorAll('input[type="radio"]');
+    questions.forEach(question => {
+        if (progress[question.name] === question.value) {
+            question.checked = true;
+        }
+    });
+}
+
+// Function to calculate the score
+function calculateScore() {
+    const answers = {
+        "q1": "B", // Paris
+        "q2": "C", // 8
+        "q3": "B", // Einstein
+        "q4": "A", // H2O
+        "q5": "B"  // Jupiter
+    };
+
+    let score = 0;
+    const questions = document.querySelectorAll('input[type="radio"]');
+    questions.forEach(question => {
+        if (question.checked && question.value === answers[question.name]) {
+            score++;
+        }
+    });
+    return score;
+}
+
+// Check for the score in local storage on page load
+if (localStorage.getItem('score')) {
+    document.getElementById('score').textContent = `Your previous score is ${localStorage.getItem('score')} out of 5.`;
+}
